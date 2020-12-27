@@ -4,24 +4,23 @@ import java.util.TimerTask;
 
 public class UpdateTimeTask extends TimerTask {
 
-	private MineFrame mf;
-	private int second;
+    private MineFrame mf;
+    private int second;
 
-	public UpdateTimeTask(MineFrame mf) {
-		super();
-		this.mf = mf;
-		this.second = 0;
-	}
+    public UpdateTimeTask(MineFrame mf) {
+        super();
+        this.mf = mf;
+        this.second = 0;
+    }
 
-	public int getSecond() {
-		return second;
-	}
+    public int getSecond() {
+        return second;
+    }
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		second++;
-		mf.setTimeUsed(second);
-	}
+    @Override
+    public void run() {
+        second++;
+        mf.setTimeUsed(second);
+    }
 
 }
