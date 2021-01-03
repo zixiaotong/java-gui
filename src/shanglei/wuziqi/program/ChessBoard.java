@@ -103,6 +103,36 @@ public class ChessBoard extends JPanel {
     class MouseMonitor extends MouseAdapter {
         @Override
         public void mousePressed(MouseEvent e) {// 鼠标在组件上按下时调用
+//            if (!isGamming) {
+//                return;
+//            }
+//            //讲鼠标点击的坐标位置转换成网络索引
+//            int col = (e.getX() - MARGIN + SPAN / 2) / SPAN;
+//            int row = (e.getY() - MARGIN + SPAN / 2) / SPAN;
+//            // 落在棋盘外不能下
+//            if (col < 0 || col > COLS || row < 0 || row > ROWS) {
+//                return;
+//            }
+//            // 如果x，y位置已经有棋子存在，不能下
+//            if (hasChess(col, row)) {
+//                return;
+//            }
+//            // 可以进行的处理
+//            Chess ch = new Chess(ChessBoard.this, col, row, isBlack ? Color.black : Color.white);
+//            chessList[chessCount++] = ch;
+//            // 通知系统重绘
+//            repaint();
+//            if (isWin(col, row)) {
+//                String colorName = isBlack ? "黑棋" : "白棋";
+//                String msg = String.format("恭喜，%s赢了！", colorName);
+//                JOptionPane.showConfirmDialog(ChessBoard.this, msg);
+//                isGamming = false;
+//            }
+//            isBlack = !isBlack;
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {// 鼠标在组件上按下时调用
             if (!isGamming) {
                 return;
             }
