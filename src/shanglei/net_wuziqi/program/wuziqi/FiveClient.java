@@ -62,11 +62,34 @@ public class FiveClient extends Frame {
                 connect();
             } else if (e.getSource() == control.cancelGameButton) {
 
-
             } else if (e.getSource() == control.joinGameButton) {
+                String select = userList.userList.getSelectedItem();
+                System.out.println(select);
+                if (select == null) {
+                    message.mesageArea.append("请选择一个对手" + "\n");
+                    return;
+                }
 
+                if (!select.endsWith("ready")) {
+                    message.mesageArea.append("请选择一个已经Ready的对手" + "\n");
+                    return;
+                }
+
+                if (select.startsWith(myname)) {
+                    message.mesageArea.append("不能选自己作为对手" + "\n");
+                    return;
+                }
+
+                int index = select.lastIndexOf(":");
+                String name = select.substring(0, index);
+                join(name);
             }
         }
+
+    }
+
+    public void join(String opponentName) {
+        c.join(opponentName);
     }
 
     public void connect() {

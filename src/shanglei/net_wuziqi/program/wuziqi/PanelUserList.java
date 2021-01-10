@@ -11,5 +11,4 @@ public class PanelUserList extends Panel {
         setLayout(new BorderLayout());
         add(userList, BorderLayout.CENTER);
     }
-
 }

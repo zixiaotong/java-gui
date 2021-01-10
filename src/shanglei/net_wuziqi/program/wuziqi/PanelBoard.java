@@ -23,6 +23,7 @@ public class PanelBoard extends JPanel {
 
     Chess[] chessList = new Chess[(ROWS + 1) * (COLS + 1)];//初始每个数组元素为null
     boolean isBlack = true;//默认开始是黑棋先
+    boolean isGoing = false;
     int chessCount = 0;//当前棋盘棋子的个数
     boolean isGamming = false;//是否正在游戏
 
@@ -172,6 +173,7 @@ public class PanelBoard extends JPanel {
     class MouseMonitor extends MouseAdapter {
         public void mousePressed(MouseEvent e) {//鼠标在组件上按下时调用
             if (!isGamming) return;
+            if (!isGoing) return;
             //将鼠标点击的坐标位置转换成网格索引
             int col = (e.getX() - MARGIN + SPAN / 2) / SPAN;
             int row = (e.getY() - MARGIN + SPAN / 2) / SPAN;
@@ -187,6 +189,9 @@ public class PanelBoard extends JPanel {
             Chess ch = new Chess(PanelBoard.this, col, row, isBlack ? Color.black : Color.white);
             chessList[chessCount++] = ch;
             repaint();//通知系统重新绘制
+
+            isGoing = false;
+
             //如果胜出则给出提示信息，不能继续下棋
             if (isWin(col, row)) {
                 String colorName = isBlack ? "黑棋" : "白棋";
