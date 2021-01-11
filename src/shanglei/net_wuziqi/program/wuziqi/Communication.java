@@ -30,14 +30,6 @@ public class Communication {
         }
     }
 
-    public void join(String opponentName) {
-        try {
-            dos.writeUTF(Command.JOIN + ":" + opponentName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     class ReceiveThread extends Thread {
         Socket s;
         private DataInputStream dis;
@@ -47,7 +39,6 @@ public class Communication {
         public ReceiveThread(Socket s) {
             this.s = s;
         }
-
 
         public void run() {
             while (true) {
@@ -87,8 +78,9 @@ public class Communication {
                         }
                         fc.message.mesageArea.append(name + " " + state + "\n");
                     } else if (words[0].equals(Command.GUESSCOLOR)) {
-                        String color = words[1];
-                        String oppName = words[2];
+                        //"guesscolor:black:player2"
+                        String color = words[1];//black
+                        String oppName = words[2]; //palyer2
                         fc.board.isGamming = true;
                         fc.opname = oppName;
                         fc.timing.setOpName(oppName);
@@ -98,7 +90,7 @@ public class Communication {
                             fc.board.isBlack = true;
                             fc.board.isGoing = true;
                         } else if (color.equals("white")) {
-                            fc.timing.setMyIcon("white");
+                            fc.timing.setMyIcon("white'");
                             fc.timing.setOpIcon("black");
                             fc.board.isBlack = false;
                             fc.board.isGoing = false;
@@ -106,12 +98,51 @@ public class Communication {
                         fc.control.joinGameButton.setEnabled(false);
                         fc.control.cancelGameButton.setEnabled(true);
                         fc.control.exitGameButton.setEnabled(false);
-                        fc.message.mesageArea.append("My color is" + color + "\n");
+
+                        fc.message.mesageArea.append("My color is " + color + "\n");
+                    } else if (words[0].equals(Command.GO)) {
+                        int col = Integer.parseInt(words[1]);
+                        int row = Integer.parseInt(words[2]);
+                        fc.board.addOpponentChess(col, row);
+                    } else if (words[0].equals(Command.TELLRESULT)) {
+                        if (words[1].equals("win"))
+                            fc.board.winsGame();
+                        else
+                            fc.board.lossesGame();
+                        fc.control.joinGameButton.setEnabled(true);
+                        fc.control.cancelGameButton.setEnabled(false);
+                        fc.control.exitGameButton.setEnabled(true);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    return;
                 }
             }
+        }
+    }
+
+    public void join(String opponentName) {
+        try {
+            dos.writeUTF(Command.JOIN + ":" + opponentName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void go(int col, int row) {
+        try {
+            String msg = Command.GO + ":" + col + ":" + row;
+            dos.writeUTF(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void wins() {
+        try {
+            dos.writeUTF(Command.WIN);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

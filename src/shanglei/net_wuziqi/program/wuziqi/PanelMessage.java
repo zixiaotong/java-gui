@@ -9,7 +9,7 @@ public class PanelMessage extends Panel {
 
     public PanelMessage() {
         setLayout(new BorderLayout());
-        mesageArea = new TextArea("", 12, 20, TextArea.SCROLLBARS_VERTICAL_ONLY);
+        mesageArea = new TextArea("", 8, 20, TextArea.SCROLLBARS_VERTICAL_ONLY);
         add(mesageArea, BorderLayout.CENTER);
     }
 }

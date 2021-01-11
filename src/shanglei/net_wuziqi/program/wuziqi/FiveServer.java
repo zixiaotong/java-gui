@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class FiveServer extends Frame implements ActionListener {
     Label lStatus = new Label("当前连接数:", Label.LEFT);
-    TextArea taMesage = new TextArea("", 22, 50, TextArea.SCROLLBARS_VERTICAL_ONLY);
+    TextArea taMessage = new TextArea("", 22, 50, TextArea.SCROLLBARS_VERTICAL_ONLY);
     Button btServerClose = new Button("关闭服务器");
 
     ServerSocket ss = null;
@@ -37,7 +37,7 @@ public class FiveServer extends Frame implements ActionListener {
         btServerClose.addActionListener(this);
 
         add(lStatus, BorderLayout.NORTH);
-        add(taMesage, BorderLayout.CENTER);
+        add(taMessage, BorderLayout.CENTER);
         add(btServerClose, BorderLayout.SOUTH);
 
         setLocation(400, 100);
@@ -66,6 +66,7 @@ public class FiveServer extends Frame implements ActionListener {
         }
     }
 
+
     public void startServer() {
         try {
             ss = new ServerSocket(TCP_PORT);
@@ -76,8 +77,8 @@ public class FiveServer extends Frame implements ActionListener {
                 Client c = new Client("Player" + clientNameNum, s);
                 clients.add(c);
                 lStatus.setText("连接数" + clientNum);
-                String msg = s.getInetAddress().getHostAddress() + "  Player" + clientNameNum + "" + "\n";
-                taMesage.append(msg);
+                String msg = s.getInetAddress().getHostAddress() + "Player" + clientNameNum + "\n";
+                taMessage.append(msg);
                 tellName(c);
                 addAllUserToMe(c);
                 addMeToAllUser(c);
@@ -92,7 +93,7 @@ public class FiveServer extends Frame implements ActionListener {
         DataOutputStream dos = null;
         try {
             dos = new DataOutputStream(c.s.getOutputStream());
-            dos.writeUTF("tellName" + ":" + c.name);
+            dos.writeUTF(Command.TELLNAME + ":" + c.name);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -106,7 +107,6 @@ public class FiveServer extends Frame implements ActionListener {
                     dos = new DataOutputStream(c.s.getOutputStream());
                     dos.writeUTF(Command.ADD + ":" + clients.get(i).name + ":" + clients.get(i).state);
                 } catch (IOException e) {
-                    // TODO: handle exception
                 }
             }
         }
@@ -142,6 +142,7 @@ public class FiveServer extends Frame implements ActionListener {
                     String msg = dis.readUTF();
                     String[] words = msg.split(":");
                     if (words[0].equals(Command.JOIN)) {
+                        ;
                         String opponentName = words[1];
                         for (int i = 0; i < clients.size(); i++) {
                             if (clients.get(i).name.equals(opponentName)) {
@@ -159,9 +160,9 @@ public class FiveServer extends Frame implements ActionListener {
                                 break;
                             }
                         }
-                    } else if (words[0].equals(Command.AGREE)) {
+                    } else if (words[0].equals(Command.AGREE)) { //"agree:p1YER1
                         c.state = "playing";
-                        String opponentName = words[1];
+                        String opponentName = words[1]; //player1
                         int opponentIndex;
                         for (int i = 0; i < clients.size(); i++) {
                             if (clients.get(i).name.equals(opponentName)) {
@@ -171,31 +172,45 @@ public class FiveServer extends Frame implements ActionListener {
                                 break;
                             }
                         }
-
                         for (int i = 0; i < clients.size(); i++) {
                             dos = new DataOutputStream(clients.get(i).s.getOutputStream());
                             dos.writeUTF(Command.CHANGE + ":" + c.name + ":playing");
                             dos.writeUTF(Command.CHANGE + ":" + opponentName + ":playing");
                         }
-
                         int r = (int) (Math.random() * 2);
                         if (r == 0) {
                             dos = new DataOutputStream(c.s.getOutputStream());
-                            dos.writeUTF(Command.GUESSCOLOR + ":black" + opponentName);
+                            dos.writeUTF(Command.GUESSCOLOR + ":black:" + opponentName);
                             dos = new DataOutputStream(c.opponent.s.getOutputStream());
-                            dos.writeUTF(Command.GUESSCOLOR + ":white" + c.name);
+                            dos.writeUTF(Command.GUESSCOLOR + ":white:" + c.name);
                         } else {
                             dos = new DataOutputStream(c.s.getOutputStream());
-                            dos.writeUTF(Command.GUESSCOLOR + ":white" + opponentName);
+                            dos.writeUTF(Command.GUESSCOLOR + ":white:" + opponentName);
                             dos = new DataOutputStream(c.opponent.s.getOutputStream());
-                            dos.writeUTF(Command.GUESSCOLOR + ":black" + c.name);
+                            dos.writeUTF(Command.GUESSCOLOR + ":black:" + c.name);
                         }
-                        taMesage.append(c.name + "playing\n");
-                        taMesage.append(opponentName + "playing\n");
-
+                        taMessage.append(c.name + "playing\n");
+                        taMessage.append(opponentName + "playing\n");
+                    } else if (words[0].equals(Command.GO)) {
+                        dos = new DataOutputStream(c.opponent.s.getOutputStream());
+                        dos.writeUTF(msg);
+                        taMessage.append(c.name + " " + msg + "\n");
+                    } else if (words[0].equals(Command.WIN)) {
+                        for (int i = 0; i < clients.size(); i++) {
+                            dos = new DataOutputStream(clients.get(i).s.getOutputStream());
+                            dos.writeUTF(Command.CHANGE + ":" + c.name + ":ready");
+                            dos.writeUTF(Command.CHANGE + ":" + c.opponent.name + ":ready");
+                        }
+                        dos = new DataOutputStream(c.s.getOutputStream());
+                        dos.writeUTF(Command.TELLRESULT + ":win"); //Ïò×Ô¼º·¢»ØÊ¤ÀûÃüÁî £¬½áÊøÓÎÏ·
+                        dos = new DataOutputStream(c.opponent.s.getOutputStream());
+                        dos.writeUTF(Command.TELLRESULT + ":losses");//Ïò¶Ô·½·¢ËÍÊ§°ÜÃüÁî£¬½áÊøÓÎÏ·
+                        c.state = "ready";
+                        c.opponent.state = "ready";
+                        taMessage.append(c.name + "win\n");
+                        taMessage.append(c.opponent.name + "loss\n");
                     }
                 } catch (IOException e) {
-                    // TODO: handle exception
                     e.printStackTrace();
                     return;
                 }

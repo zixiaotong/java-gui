@@ -23,7 +23,7 @@ public class FiveClient extends Frame {
 
     public FiveClient() {
         super("五子棋客户端");
-        board = new PanelBoard();
+        board = new PanelBoard(this);
         this.add(board, BorderLayout.CENTER);
 
         timing = new PanelTiming();
@@ -53,7 +53,6 @@ public class FiveClient extends Frame {
     }
 
     class ActionMonitor implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == control.exitGameButton) {

@@ -26,8 +26,10 @@ public class PanelBoard extends JPanel {
     boolean isGoing = false;
     int chessCount = 0;//当前棋盘棋子的个数
     boolean isGamming = false;//是否正在游戏
+    FiveClient fc;
 
-    public PanelBoard() {
+    public PanelBoard(FiveClient fc) {
+        this.fc = fc;
         img = Toolkit.getDefaultToolkit().getImage("image/board.jpg");
         this.addMouseListener(new MouseMonitor());
         this.addMouseMotionListener(new MouseMotionMonitor());
@@ -191,15 +193,17 @@ public class PanelBoard extends JPanel {
             repaint();//通知系统重新绘制
 
             isGoing = false;
+            fc.c.go(col, row);
 
             //如果胜出则给出提示信息，不能继续下棋
             if (isWin(col, row)) {
-                String colorName = isBlack ? "黑棋" : "白棋";
-                String msg = String.format("恭喜，%s赢了！", colorName);
-                JOptionPane.showMessageDialog(PanelBoard.this, msg);
-                isGamming = false;
+                fc.c.wins();
+//                String colorName = isBlack ? "黑棋" : "白棋";
+//                String msg = String.format("恭喜，%s赢了！", colorName);
+//                JOptionPane.showMessageDialog(PanelBoard.this, msg);
+//                isGamming = false;
             }
-            isBlack = !isBlack;
+//            isBlack = !isBlack;
         }
     }
 
@@ -212,5 +216,36 @@ public class PanelBoard extends JPanel {
             else
                 PanelBoard.this.setCursor(new Cursor(Cursor.HAND_CURSOR));
         }
+    }
+
+    public void addOpponentChess(int col, int row) {
+        Chess ch = new Chess(this, col, row, isBlack ? Color.white : Color.BLACK);
+        chessList[chessCount++] = ch;
+        isGoing = true;
+        repaint();
+    }
+
+    public void winsGame() {
+        resetGame();
+        String colorName = isBlack ? "黑棋" : "白棋";
+        String msg = String.format("恭喜，%s赢了！", colorName);
+        JOptionPane.showMessageDialog(PanelBoard.this, msg);
+    }
+
+    public void lossesGame() {
+        resetGame();
+        String colorName = isBlack ? "黑棋" : "白棋";
+        String msg = String.format("遗憾，%s输了！", colorName);
+        JOptionPane.showMessageDialog(PanelBoard.this, msg);
+    }
+
+    public void resetGame() {
+        chessCount = 0;
+        isGamming = false;
+        for (int i = 0; i < chessList.length; i++) {
+            chessList[i] = null;
+        }
+        repaint();
+        fc.control.joinGameButton.setEnabled(true);
     }
 }
